@@ -35,3 +35,5 @@ out/
 
 ### VS Code ###
 .vscode/
+/src/main/resources/discord-token.yml
+/src/main/resources/mongo-config.yml
