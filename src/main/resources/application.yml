@@ -8,7 +8,16 @@ server:
 spring:
   profiles:
     active: dev
+  config:
+    import: classpath:discord-token.yml, classpath:mongo-config.yml
+  data:
+    mongodb:
+      uri: ${mongo.uri}
+      database: ${mongo.database}
 
 logging:
   level:
     root: info
+
+jda:
+  token: ${discord.token}
