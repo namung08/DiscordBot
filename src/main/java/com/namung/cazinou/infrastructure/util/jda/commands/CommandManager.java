@@ -18,6 +18,7 @@ public class CommandManager {
     commandMap.put("출석체크", new GiveMoneyCommand(cazinouUserService));
     commandMap.put("잔액확인", new CheckBalanceCommand(cazinouUserService));
     commandMap.put("개발자", new GetBotCraterGinHubCommand());
+    commandMap.put("일하기", new WorkCommand(cazinouUserService));
   }
 
   public SlashCommands getCommand(String commandName) {
@@ -41,6 +42,16 @@ public class CommandManager {
       "개발자 정보를 확인합니다."
     );
 
-    return List.of(giveMoneyCommand, checkBalanceCommand, botCraterInfoCommand);
+    CommandData workCommand = Commands.slash(
+      "일하기",
+      "10초간 개처럼 일합니다.\n" + "일을 시작하면 1분간 일을 못해요~"
+    );
+
+    return List.of(
+      giveMoneyCommand,
+      checkBalanceCommand,
+      botCraterInfoCommand,
+      workCommand
+    );
   }
 }
