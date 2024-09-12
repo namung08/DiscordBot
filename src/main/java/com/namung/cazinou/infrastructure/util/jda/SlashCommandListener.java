@@ -50,33 +50,52 @@ public class SlashCommandListener extends ListenerAdapter {
     if (!cazinouUserService.isUserExist(event.getUser())) {
       cazinouUserService.saveUser(event.getUser());
     }
-    try {
-      // 명령어 처리 로직
-      SlashCommands command = commandManager.getCommand(event.getName());
-      command.execute(event);
-    } catch (CazinouException e) {
-      handleException(event, e, "오류 발생", e.getMessage(), Color.RED);
-    } catch (MethodArgumentTypeMismatchException e) {
-      handleException(
-        event,
-        e,
-        "잘못된 인자 타입",
-        e.getMessage(),
-        Color.YELLOW
-      );
-    } catch (ConstraintViolationException e) {
-      handleException(
-        event,
-        e,
-        "유효성 검증 실패",
-        e.getMessage(),
-        Color.ORANGE
-      );
-    } catch (RuntimeException e) {
-      handleException(event, e, "런타임 오류", e.getMessage(), Color.RED);
-    } catch (Exception e) {
-      handleException(event, e, "서버 내부 오류", e.getMessage(), Color.RED);
-    }
+    event
+      .deferReply(false)
+      .queue(hook -> {
+        EmbedUtil.sendProcessingEmbedWithHook(hook); // 명령어가 처리 중임을 알림
+        try {
+          // 명령어 처리 로직
+          SlashCommands command = commandManager.getCommand(event.getName());
+          command.execute(event, hook);
+        } catch (CazinouException e) {
+          handleException(event, e, "오류 발생", e.getMessage(), Color.RED);
+        } catch (IllegalArgumentException e) {
+          handleException(
+            event,
+            e,
+            "잘못된 인자",
+            e.getMessage(),
+            Color.YELLOW
+          );
+        } catch (MethodArgumentTypeMismatchException e) {
+          handleException(
+            event,
+            e,
+            "잘못된 인자 타입",
+            e.getMessage(),
+            Color.YELLOW
+          );
+        } catch (ConstraintViolationException e) {
+          handleException(
+            event,
+            e,
+            "유효성 검증 실패",
+            e.getMessage(),
+            Color.ORANGE
+          );
+        } catch (RuntimeException e) {
+          handleException(event, e, "런타임 오류", e.getMessage(), Color.RED);
+        } catch (Exception e) {
+          handleException(
+            event,
+            e,
+            "서버 내부 오류",
+            e.getMessage(),
+            Color.RED
+          );
+        }
+      });
   }
 
   private void handleException(

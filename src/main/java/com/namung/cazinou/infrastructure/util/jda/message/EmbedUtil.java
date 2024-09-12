@@ -1,7 +1,9 @@
 package com.namung.cazinou.infrastructure.util.jda.message;
 
+import java.awt.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class EmbedUtil {
 
@@ -103,5 +105,28 @@ public class EmbedUtil {
       event.getUser().getEffectiveAvatarUrl()
     );
     event.replyEmbeds(embed.build()).setEphemeral(isEphemeral).queue();
+  }
+
+  // InteractionHook을 통해 임베드 전송
+  public static void sendProcessingEmbedWithHook(InteractionHook hook) {
+    // 처리 중 메시지 전송
+    MessageModel loadingEmbed = MessageModel.builder()
+      .title("명령어 처리 중")
+      .description("명령어가 처리되고 있습니다. 잠시만 기다려 주세요.")
+      .color(Color.YELLOW)
+      .build();
+    hook
+      .sendMessageEmbeds(createEmbedFromMessageModel(loadingEmbed).build())
+      .setEphemeral(true)
+      .queue();
+  }
+
+  // InteractionHook을 통해 임베드 수정
+  public static void sendSuccessEmbedWithHook(
+    InteractionHook hook,
+    MessageModel messageModel
+  ) {
+    EmbedBuilder embedBuilder = createEmbedFromMessageModel(messageModel);
+    hook.editOriginalEmbeds(embedBuilder.build()).queue();
   }
 }
