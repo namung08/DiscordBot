@@ -94,9 +94,14 @@ public class EmbedUtil {
   // 예시로 사용될 메서드 (SlashCommandInteractionEvent로 임베드 전송)
   public static void sendEmbed(
     SlashCommandInteractionEvent event,
-    MessageModel messageModel
+    MessageModel messageModel,
+    Boolean isEphemeral
   ) {
     EmbedBuilder embed = createEmbedFromMessageModel(messageModel);
-    event.replyEmbeds(embed.build()).queue();
+    embed.setFooter(
+      event.getMember().getEffectiveName(),
+      event.getUser().getEffectiveAvatarUrl()
+    );
+    event.replyEmbeds(embed.build()).setEphemeral(isEphemeral).queue();
   }
 }
