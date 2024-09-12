@@ -9,6 +9,11 @@ import com.namung.cazinou.user.service.CazinouUserService;
 import jakarta.validation.ConstraintViolationException;
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.dv8tion.jda.api.JDA;
@@ -27,6 +32,14 @@ public class SlashCommandListener extends ListenerAdapter {
 
   private final CazinouUserService cazinouUserService;
   private final CommandManager commandManager; // 명령어 관리 객체
+
+  private final Map<String, Long> userCommandCooldowns =
+    new ConcurrentHashMap<>();
+  private static final long COMMAND_COOLDOWN = 60000; // 60초 제한 시간
+  private static final long COOLDOWN_CLEAR_DELAY = 70000; // 70초 후 삭제
+
+  private final ScheduledExecutorService scheduler =
+    Executors.newScheduledThreadPool(1);
 
   public JDA registerCommands(JDA jda) {
     log.info("Registering commands...");
@@ -50,6 +63,38 @@ public class SlashCommandListener extends ListenerAdapter {
     if (!cazinouUserService.isUserExist(event.getUser())) {
       cazinouUserService.saveUser(event.getUser());
     }
+
+    String userId = event.getUser().getId();
+
+    if (event.getName().equals("일하기")) {
+      if (userCommandCooldowns.containsKey(userId)) {
+        long lastCommandTime = userCommandCooldowns.get(userId);
+        long currentTime = System.currentTimeMillis();
+
+        if (currentTime - lastCommandTime < COMMAND_COOLDOWN) {
+          MessageModel cooldownMessage = MessageModel.builder()
+            .title("너무 힘들어용 ㅠㅠ")
+            .description(
+              "너무 일하셨어요... \n" +
+              "일하는 것도 좋지만 쉬엄쉬업 합니다~\n" +
+              (60 - (currentTime - lastCommandTime) / 1000) +
+              "초 기다려 주세요."
+            )
+            .color(Color.RED)
+            .build();
+          EmbedUtil.sendEmbed(event, cooldownMessage, true);
+          return;
+        }
+      }
+      // 현재 시간 기록 후, 10초 후 해당 기록 삭제
+      userCommandCooldowns.put(userId, System.currentTimeMillis());
+      scheduler.schedule(
+        () -> userCommandCooldowns.remove(userId),
+        COOLDOWN_CLEAR_DELAY,
+        TimeUnit.MILLISECONDS
+      );
+    }
+
     event
       .deferReply(false)
       .queue(hook -> {
