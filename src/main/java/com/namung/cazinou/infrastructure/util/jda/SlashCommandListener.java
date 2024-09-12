@@ -31,7 +31,9 @@ public class SlashCommandListener extends ListenerAdapter {
 
   @Override
   public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-    log.info("Slash command received: {}", event.getName());
+    if (event.getUser().isBot()) {
+      return;
+    }
     // 명령어를 입력한 사용자의 정보를 MongoDB에 저장을 해야함
     if (!cazinouUserService.isUserExist(event.getUser())) {
       cazinouUserService.saveUser(event.getUser());
