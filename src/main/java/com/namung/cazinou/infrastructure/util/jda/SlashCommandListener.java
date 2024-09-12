@@ -5,6 +5,7 @@ import com.namung.cazinou.infrastructure.util.jda.commands.SlashCommands;
 import com.namung.cazinou.infrastructure.util.jda.message.EmbedUtil;
 import com.namung.cazinou.infrastructure.util.jda.message.MessageModel;
 import com.namung.cazinou.user.service.CazinouUserService;
+import java.awt.*;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -64,6 +65,7 @@ public class SlashCommandListener extends ListenerAdapter {
           .description(
             "명령어를 입력하려면 채널 주제를 `#cazinou`를 추가해 주세요."
           )
+          .color(Color.RED)
           .build();
         // Embed 메시지 전송 (비공개 응답)
         EmbedUtil.sendEmbed(e, messageModel, true);
@@ -78,6 +80,7 @@ public class SlashCommandListener extends ListenerAdapter {
           .description(
             "명령어를 입력하려면 채널 주제를 `#cazinou`로 변경해주세요."
           )
+          .color(Color.RED)
           .build();
         // Embed 메시지 전송 (비공개 응답)
         EmbedUtil.sendEmbed(e, messageModel, true);
