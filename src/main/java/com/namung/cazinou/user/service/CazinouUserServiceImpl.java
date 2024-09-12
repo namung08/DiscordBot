@@ -3,6 +3,7 @@ package com.namung.cazinou.user.service;
 import com.mongodb.MongoTimeoutException;
 import com.namung.cazinou.infrastructure.exception.CazinouException;
 import com.namung.cazinou.infrastructure.exception.CazinouExceptionCode;
+import com.namung.cazinou.infrastructure.util.jda.message.WorkMessage;
 import com.namung.cazinou.user.model.CazinouUser;
 import com.namung.cazinou.user.repository.CazinouUserRepository;
 import com.namung.cazinou.user.repository.CustomCazinouUserRepository;
@@ -61,6 +62,17 @@ public class CazinouUserServiceImpl implements CazinouUserService {
   @Override
   public Long getUserBalance(User user) {
     return getUserByDiscordId(user.getIdLong()).getBalance();
+  }
+
+  @Override
+  public Integer work(User user) {
+    CazinouUser cazinouUser = getUserByDiscordId(user.getIdLong());
+    // 0부터 10 까지 랜덤한 숫자를 생성
+    int result = (int) (Math.random() * 10);
+    Long resultMoney = WorkMessage.getMoneyList().get(result);
+    cazinouUser.setBalance(cazinouUser.getBalance() + resultMoney);
+    customRepository.updateUser(cazinouUser);
+    return result;
   }
 
   private CazinouUser getUserByDiscordId(Long discordId) {

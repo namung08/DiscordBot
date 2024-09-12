@@ -44,4 +44,6 @@ public interface CazinouUserService {
   String attendanceCheck(User user);
 
   Long getUserBalance(User user);
+
+  Integer work(User user);
 }
