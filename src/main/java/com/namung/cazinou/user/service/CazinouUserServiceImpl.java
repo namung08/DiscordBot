@@ -69,9 +69,7 @@ public class CazinouUserServiceImpl implements CazinouUserService {
     CazinouUser cazinouUser = getUserByDiscordId(user.getIdLong());
     // 0부터 10 까지 랜덤한 숫자를 생성
     int result = (int) (Math.random() * 10);
-    Long resultMoney = WorkMessage.getMoneyList().get(result);
-    cazinouUser.setBalance(cazinouUser.getBalance() + resultMoney);
-    customRepository.updateUser(cazinouUser);
+    modificationBalanceByMoney(user, WorkMessage.getMoneyList().get(result));
     return result;
   }
 
